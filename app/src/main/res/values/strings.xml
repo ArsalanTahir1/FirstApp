@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FirstApp</string>
+    <string name="zipcode_error">Please enter a valid zipcode!</string>
+</resources>

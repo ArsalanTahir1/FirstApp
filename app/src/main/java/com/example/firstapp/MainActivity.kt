@@ -14,14 +14,18 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.firstapp.details.ForecastDetailsActivity
+import com.example.firstapp.forecast.CurrentForecastFragement
+import com.example.firstapp.location.LocationEntrykFragment
 
- class MainActivity : AppCompatActivity() {
+ class MainActivity : AppCompatActivity(), AppNavigator {
 
 
     // Object of ForecastRepository.
 
-    private val forecastRepository = ForecastRepository()
-    private lateinit var tempDisplaySettingsManager: TempDisplaySettingsManager
+    // Pasted in currentFOrecastFreagemnt private val forecastRepository = ForecastRepository()
+
+
+     private lateinit var tempDisplaySettingsManager: TempDisplaySettingsManager
 
     /*Now we have forecastRepository so we can reference it down
     below in our code
@@ -36,7 +40,7 @@ import com.example.firstapp.details.ForecastDetailsActivity
         setTitle("Weather")
 
         tempDisplaySettingsManager = TempDisplaySettingsManager(this)
-
+/*
         val zipcode_edittext: EditText = findViewById(R.id.zipcode_editText)
         val submitbutton: Button = findViewById(R.id.submit_button)
 
@@ -58,9 +62,13 @@ import com.example.firstapp.details.ForecastDetailsActivity
 
             }
 
-        val forecastListRecyclerView : RecyclerView = findViewById(R.id.forecastListRecyclerView)
-        /*when we will pass our data to recycler view it will display a vertiaclly
-        scrolable list*/
+
+ */
+        //reference to recyclerview
+
+
+        /*
+        //going to paste in new CurrentForecastFragement
 
         forecastListRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -71,6 +79,8 @@ import com.example.firstapp.details.ForecastDetailsActivity
             Now we can pass in any number of aurguments and those aurguments will be
             used to fill in the string templaate parameters
             */
+
+
             /*
             val msg = getString(R.string.forecast_clicked_format,it.temp,it.description)
             Toast.makeText(this,msg,Toast.LENGTH_SHORT).show()
@@ -120,6 +130,17 @@ import com.example.firstapp.details.ForecastDetailsActivity
         forecastRepository.weeklyForecast.observe(this,weeklyForcastObserver)
 
 
+
+
+
+         */
+
+
+
+
+        //fragement implementation
+        supportFragmentManager.beginTransaction().add(R.id.fragementContainer,LocationEntrykFragment()).commit()
+
     }
 
 
@@ -158,12 +179,40 @@ import com.example.firstapp.details.ForecastDetailsActivity
      }
 
 
+     /*
+     Overiding method of AppNavigator
+     So now when in Activity, navigateToCurrentForecast is called
+     by some external class we will call loadForecast on our
+     repository which will then show that weather data. So how are we
+     going to call this method? We will go in locationentry fragment
+      */
+
+     override fun navigateToCurrentForecast(zipcode: String) {
+         /*going to pass current forecast fragement cuz it is going
+          to be responsible for loading and showing data
+         */
+
+         supportFragmentManager.beginTransaction()
+                                             //calling new instnce method from companion object
+                 .replace(R.id.fragementContainer,CurrentForecastFragement.newInstance((zipcode)))
+                 .commit()
+
+         //forecastRepository.loadForecast(zipcode)
+     }
+
+
+     override fun navigateToLocationEntry() {
+
+         supportFragmentManager.beginTransaction().replace(R.id.fragementContainer, LocationEntrykFragment()).commit()
+     }
+
+
 
 
      // Menu
 
 
-
+     /* Pasted in new fragment
      private fun showForecastDetails(forecast: DailyForecast)
      { /*Its going to be an explicit intent cuz we are going
               to tell us what activity to launch. startActivity is
@@ -177,6 +226,6 @@ import com.example.firstapp.details.ForecastDetailsActivity
 
 
      }
-
+      */
 
 }

@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">FirstApp</string>
     <string name="zipcode_error">Please enter a valid zipcode!</string>
+    /*%1 says this is the first formatted string $.3f that we are going
+    to use a float to the percision of 2 decimal points , $s indicates that
+    are going to use string for 2nd one
+    */
+    <string name="forecast_clicked_format">Forecast: %1$.2f %2$s</string>
+    <string name="forecast_details">Forecast Details </string>
+    <string name="Display_Units">Disply Units</string>
 </resources>

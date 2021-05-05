@@ -1,6 +1,5 @@
 package com.example.firstapp.location
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import com.example.firstapp.AppNavigator
+import androidx.navigation.fragment.findNavController
 import com.example.firstapp.R
 
 
@@ -38,34 +37,34 @@ class LocationEntrykFragment : Fragment() {
 
 
 
-    /*
-    The reason its lateinit bcoz we are going to initialize it onAttach()
-     */
-    private lateinit var appNavigator: AppNavigator
-
-
-    /* onAttach is one of the lifrcycle methods that happens
-       very early in fragment LC it when the fragemnet is addaed to
-       the activity. So this is the first point where we can get
-       reference to activity or context. Bcoz fragement have to live
-       with in the activity we can take adv of that fact and bcoz we
-       except our activity to implement this appNavigator interface,
-       we can assume that this context is our app Navigator
-
-     */
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        /*
-          as keyword is how we cast variable to another type.
-          We are saying that we want to assign appnavigator the
-          value of context. It means that appnavigator will now
-          have reference to our Activity. Now that we have
-          reference we will go to submit button....
-
-         */
-        appNavigator = context as AppNavigator
-    }
+//    /*
+//    The reason its lateinit bcoz we are going to initialize it onAttach()
+//     */
+//    private lateinit var appNavigator: AppNavigator
+//
+//
+//    /* onAttach is one of the lifrcycle methods that happens
+//       very early in fragment LC it when the fragemnet is addaed to
+//       the activity. So this is the first point where we can get
+//       reference to activity or context. Bcoz fragement have to live
+//       with in the activity we can take adv of that fact and bcoz we
+//       except our activity to implement this appNavigator interface,
+//       we can assume that this context is our app Navigator
+//
+//     */
+//    override fun onAttach(context: Context) {
+//        super.onAttach(context)
+//
+//        /*
+//          as keyword is how we cast variable to another type.
+//          We are saying that we want to assign appnavigator the
+//          value of context. It means that appnavigator will now
+//          have reference to our Activity. Now that we have
+//          reference we will go to submit button....
+//
+//         */
+//        appNavigator = context as AppNavigator
+//    }
 
 
 
@@ -109,7 +108,7 @@ class LocationEntrykFragment : Fragment() {
                 its being started in the activity and being handled by activity
                  */
 
-                appNavigator.navigateToCurrentForecast(zipcode)
+                findNavController().navigateUp()
 
 
               //  forecastRepository.loadForecast(zipcode)

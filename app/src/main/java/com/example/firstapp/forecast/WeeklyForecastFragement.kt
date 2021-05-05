@@ -16,7 +16,7 @@ import com.example.firstapp.details.ForecastDetailsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
-class CurrentForecastFragement : Fragment() {
+class WeeklyForecastFragement : Fragment() {
 
 
     private lateinit var tempDisplaySettingsManager: TempDisplaySettingsManager
@@ -26,7 +26,6 @@ class CurrentForecastFragement : Fragment() {
 
 
     // pasted from locationfrag
-
 
 
     // pasted from locationfrag
@@ -46,13 +45,13 @@ class CurrentForecastFragement : Fragment() {
 
           !! it will crash if it is going to be null
         */
-     val zipcode =""//arguments!!.getString(KEY_ZIPCODE) ?: "12345"
+        val zipcode = ""//arguments!!.getString(KEY_ZIPCODE) ?: ""
 
 
 
 
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_current_forecast_fragement, container, false)
+        val view = inflater.inflate(R.layout.fragment_weekly_forecast, container, false)
 
 
 
@@ -88,14 +87,15 @@ class CurrentForecastFragement : Fragment() {
 
     private fun showLocationEntry()
     {
-        val action = CurrentForecastFragementDirections.actionCurrentForecastFragementToLocationEntrykFragment()
+        val action = WeeklyForecastFragementDirections.actionWeeklyForecastFragementToLocationEntrykFragment()
         findNavController().navigate(action)
+
     }
 
 
     private fun showForecastDetails(forecast: DailyForecast)
     {
-        val action = CurrentForecastFragementDirections.actionCurrentForecastFragementToForecastDetailsFragment(forecast.temp,forecast.description)
+        val action = WeeklyForecastFragementDirections.actionWeeklyForecastFragementToForecastDetailsFragment(forecast.temp,forecast.description)
         findNavController().navigate(action)
     }
 
@@ -112,9 +112,9 @@ class CurrentForecastFragement : Fragment() {
         const val KEY_ZIPCODE = "key_zipcode"
 
 
-        fun newInstance(zipcode:String) : CurrentForecastFragement
+        fun newInstance(zipcode:String) : WeeklyForecastFragement
         {
-            val fragement = CurrentForecastFragement()
+            val fragement = WeeklyForecastFragement()
 
             /*Bundle is simple class defined to store key value pairs in android
               we caan use bundles to pass things to intents or to pass in around

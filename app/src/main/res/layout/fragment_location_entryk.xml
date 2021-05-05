@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#BAFABD"
+    android:background="#00FD8F2E"
     tools:context=".location.LocationEntrykFragment">
 
     <TextView
@@ -36,7 +36,7 @@
         android:layout_width="87dp"
         android:layout_height="33dp"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="288dp"
+        android:layout_marginBottom="176dp"
         android:hint="Submit Zipcode"
         android:inputType="number"
         android:textSize="12sp"
@@ -52,6 +52,7 @@
         android:layout_width="124dp"
         android:layout_height="43dp"
         android:text="Submit"
+        android:textColorLink="#FFA000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/zipcode_editText"
         app:layout_constraintHorizontal_bias="0.513"

@@ -1,23 +1,23 @@
 package com.example.firstapp.forecast
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.example.firstapp.*
 import com.example.firstapp.api.DailyForecast
 import com.example.firstapp.api.WeeklyForecast
-import com.example.firstapp.details.ForecastDetailsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import java.text.SimpleDateFormat
+import java.util.*
 
+private val DATE_FORMAT = SimpleDateFormat("MM-dd-yyyy")
 
 class WeeklyForecastFragement : Fragment() {
 
@@ -77,13 +77,7 @@ class WeeklyForecastFragement : Fragment() {
 
 
         val weeklyForcastObserver = Observer<WeeklyForecast>{ weeklyForecast->
-            /*
-            and now we'll pass in weekly forecast
-dot daily that'll pass in that
-list of the daily forecast items to our
-adapter
 
-             */
             dailyForecastAdapter.submitList(weeklyForecast.daily)
 
         }
@@ -99,7 +93,7 @@ adapter
 
 
 
-        //Created Observer
+
 
         locationRepository = LocationRepository(requireContext())
         val savedLocationObserver = Observer<Location> {savedLocaation ->
@@ -108,8 +102,6 @@ adapter
             is Location.Zipcode -> forecastRepository.loadWeeklyForecast(savedLocaation.zipcode)
         }
         }
-
-        //Now to observe value
 
         locationRepository.savedLocation.observe(viewLifecycleOwner,savedLocationObserver)
 
@@ -142,39 +134,23 @@ adapter
     }
 
 
-    /*
-    we also are going to want to update um
-how we are passing this data in so again
-let's update the import for daily
-forecast
-and then now we're going to need to
-update how we're getting the temperature
-and the description
-so let's create a new property for the
-temperature
-so we'll say val temp equals
 
-     */
 
 
     private fun showForecastDetails(forecast: DailyForecast)
     {
         val temp = forecast.temp.max
         val description = forecast.weather[0].description
-        val action = WeeklyForecastFragementDirections.actionWeeklyForecastFragementToForecastDetailsFragment(temp,description)
+        val date = DATE_FORMAT.format(Date(forecast.date * 1000))
+        val icon = forecast.weather[0].icon
+
+        val action = WeeklyForecastFragementDirections.actionWeeklyForecastFragementToForecastDetailsFragment(temp,description,date,icon)
         findNavController().navigate(action)
     }
 
     companion object
     {
-        //we are going to pass in a key value pair to this fragement
-        /* and use this to access current zipcode. we are going to do
-           this by creating method called  new instance method.
-           New instance method becomes a factory fragement that
-           takes in any aurgument that that fragment needs to operate
-           correctly. In our case it is going to take in a zipcode
-           and then we can use that zipcode to load the required data
-        */
+
         const val KEY_ZIPCODE = "key_zipcode"
 
 
@@ -182,10 +158,7 @@ so we'll say val temp equals
         {
             val fragement = WeeklyForecastFragement()
 
-            /*Bundle is simple class defined to store key value pairs in android
-              we caan use bundles to pass things to intents or to pass in around
-              fragement aurguments. Now we have a bundle we can put zipcode into it
-            * */
+
             val args = Bundle()
             args.putString(KEY_ZIPCODE,zipcode)
             //setting bundle into fragement

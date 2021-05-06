@@ -24,7 +24,7 @@
     </fragment>
     <fragment
         android:id="@+id/forecastDetailsFragment"
-        android:name="com.example.firstapp.details.ForecastDetailsFragment"
+        android:name="com.example.firstapp.details.ForecastDetailsFragement"
         android:label="Weather"
         tools:layout="@layout/fragement_forecast_details" >
         <argument
@@ -32,6 +32,12 @@
             app:argType="float" />
         <argument
             android:name="description"
+            app:argType="string" />
+        <argument
+            android:name="date"
+            app:argType="string" />
+        <argument
+            android:name="icon"
             app:argType="string" />
     </fragment>
     <fragment

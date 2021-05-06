@@ -1,12 +1,33 @@
 package com.example.firstapp
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.firstapp.api.CurrentWeather
+import com.example.firstapp.api.WeeklyForecast
+import com.example.firstapp.api.createOpenWeatherMapService
+import retrofit2.Call
+import retrofit2.Response
 import java.io.Serializable
+import java.util.*
+import javax.security.auth.callback.Callback
 import kotlin.random.Random
 
 
 class  ForecastRepository {
+
+
+
+    private val _currentWeather =MutableLiveData<CurrentWeather>()
+    val currentWeather : LiveData<CurrentWeather> = _currentWeather
+
+
+
+
+
+
+
+
 
 
     /*We are defining this private property that will be internal to our forecast
@@ -19,7 +40,7 @@ class  ForecastRepository {
 
     /*Defined private read only property called _weeklyForecast and assigned
       a value of MutableLiveData that will hold a list of dailyforecast item*/
-     private val _weeklyForecast = MutableLiveData<List<DailyForecast>>()
+     private val _weeklyForecast = MutableLiveData<WeeklyForecast>()
 
 
     /*But we still need to make a way for our activity to listen for that update so
@@ -30,7 +51,7 @@ class  ForecastRepository {
     only place that can modify this data
      */
 
-    val weeklyForecast : LiveData<List<DailyForecast>> = _weeklyForecast
+    val weeklyForecast : LiveData<WeeklyForecast> = _weeklyForecast
 
 
     /*So now we have means of updating activity with data we now need
@@ -56,49 +77,223 @@ class  ForecastRepository {
      */
 
 
-    fun loadForecast(zipcode: String)
+
+
+
+
+
+
+
+
+
+
+
+    /*
+because we're going to see how we can
+chain together
+two asynchronous calls so what we're
+going to do is make a call
+to the current weather endpoint because
+it will return us back a lot long
+we'll then use the lat long to call the
+second endpoint and get the seven day
+forecast
+so to start off
+we'll type val call equals
+
+ */
+    fun loadWeeklyForecast(zipcode: String)
     {
-        //This gives us our temperature values
+        val call = createOpenWeatherMapService().currentWeather(zipcode,"imperial",BuildConfig.OPEN_WEATHER_MAP_API_KEY)
+        //copypasted from below
+        call.enqueue(object : retrofit2.Callback<CurrentWeather>
+        {
+            override fun onFailure(call: Call<CurrentWeather>, t: Throwable) {
 
-        val randomValues = List(7){Random.nextFloat().rem(100) * 100}
-
-        /*Now we wanna convert those temperatures into Forecast items, for that
-          we are going to create a new local variable. We are gonna use this to
-          create items that we are going to send to our LiveData. We referenced the
-          list of that temperature values and then we are going to use a map function
-          which lets us convert one type to another. Its going to take each of that
-          forecast value and convet it to different output value. In out case we want
-          to convert it to an output value of dailyforecast. As daily forecast have two
-          two variables or parameters temperature and description. We filled
-          forecastItemslist with each individual item of daily forecast with random
-          temperature values coming from the list "randomValues" and for the description
-          for all these daily forecast items we are going to use "Partly Cloudy" for now.
-          We are going to comebaack to update our description later
-
-        */
-
-        val forecastItemslist = randomValues.map {temp->
-            DailyForecast(temp,getTempDescription(temp))
-
-        }
-
-        /* Now wanna send this list to our Livedata, to do that we need to reference
-           our _weeklyForecast property. SetValue is basically going to let us update
-            whatever value is currently held by the Livedata. _weeklyForecast will be
-            updated with these new items and because weeklyForecast is based on
-            _weeklyForecast, that means that weeklyForecast is also going to be updated*/
-
-        _weeklyForecast.setValue(forecastItemslist)
+                Log.e(ForecastRepository::class.java.simpleName,"error loading location for weekly forecast", t)
+            }
 
 
-        /* So now the next step is to go to our main activity and actually start observing these
-           values
-        */
+            //When things load correctly
+            override fun onResponse(call: Call<CurrentWeather>, response: Response<CurrentWeather>)
+            {
+
+                val weatherResponse= response.body()
+                if (weatherResponse!=null)
+                {
+                    /*
+                    and so now down here if we get
+the weather response instead of updating
+the live data
+we are going to load seven day
+forecast
+so within this we'll then make another
+call
+so this will be val
+forecast call equals
+                     */
+                    //Load 7 days forecast
+                    val forecastCall = createOpenWeatherMapService().sevenDayForecast(
+                        lat = weatherResponse.coord.lat,
+                        lon = weatherResponse.coord.lan,
+                        /*
+                        hourly so this endpoint actually
+can return you back current weather oh
+minute by minute weather
+hourly weather we only want the seven
+day forecast so we exclude
+all of the rest of that stuff
+
+                         */
+                        exclude = "current,minutely,hourly",
+                        units = "imperial",
+                        apiKey = BuildConfig.OPEN_WEATHER_MAP_API_KEY
+                    )
+                    /*
+                    we have that new large call
+created now we need to call in queue on
+it
+
+                     */
+
+                    forecastCall.enqueue(object : retrofit2.Callback<WeeklyForecast>{
+                        override fun onFailure(call: Call<WeeklyForecast>, t: Throwable) {
+                            Log.e(ForecastRepository::class.java.simpleName,"error loading weekly forecast")
+                        }
+
+                        override fun onResponse( call: Call<WeeklyForecast>,response: Response<WeeklyForecast> )
+                        {
+                            val weeklyForecastResponse = response.body()
+                            if (weeklyForecastResponse!=null)
+                            {
+                                _weeklyForecast.value = weeklyForecastResponse
+                            }
+                            /*
+                             so that will
+update our
+live data and ultimately update our ui
+when we have loaded that forecast
+
+                             */
+                        }
+
+                    })
 
 
+                }
+            }
+
+        })
 
 
     }
+
+
+
+
+
+    fun loadCurrentForecast(zipcode: String)
+    {
+        /*
+        so now let's go ahead and kick this off
+        by creating a call class that represents that request to the endpoint we want
+
+         */
+        val call = createOpenWeatherMapService().currentWeather(zipcode,"imperial",BuildConfig.OPEN_WEATHER_MAP_API_KEY)
+
+        /*
+        so then how do we actually use this call
+to get a response back
+well as we saw in the the lecture notes
+previously we can type
+call.nq
+and then we need to pass a callback in
+here so we're going to basically create
+a
+an anonymous inner class here so this
+will be an implementation of the
+callback
+without any actual name it'll be used
+just in this location
+
+         */
+
+
+        call.enqueue(object : retrofit2.Callback<CurrentWeather>
+        {
+            override fun onFailure(call: Call<CurrentWeather>, t: Throwable) {
+            /*
+            log dot e will be use the the default
+android logger
+to just log that issue locally
+
+             */
+                Log.e(ForecastRepository::class.java.simpleName,"error loading current weather", t)
+            }
+
+
+            //When things load correctly
+            override fun onResponse(call: Call<CurrentWeather>, response: Response<CurrentWeather>)
+            {
+                /*
+                dot
+body that dot body call will essentially
+unwrap it from the response call
+at this point we can check if that is
+null or not so we can say
+if whether response does not equal
+null then we could update
+our current forecast
+
+data
+
+                 */
+                val weatherResponse= response.body()
+                if (weatherResponse!=null)
+                {
+                    /*
+                    now you might see a little bit of an
+issue here
+we have current forecast which is
+expecting a daily forecast but we have
+our weather response which is a current
+weather object
+
+so we need to come back up to the top of
+our repository
+and update current forecast to take in
+that new current
+weather model that we defined
+
+
+                     */
+                    _currentWeather.value = weatherResponse
+                }
+            }
+
+        })
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /*
     Here we are going to do implementaion for random generation of description

@@ -3,10 +3,23 @@ package com.example.firstapp
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.example.firstapp.api.DailyForecast
+import java.text.SimpleDateFormat
+import java.util.*
+
+/*
+so now we can use this date format to
+format the time stamps that we're
+getting back from the api
+
+ */
+private val DATE_FORMAT = SimpleDateFormat("MM-dd-yyyy")
 
 
 /*
@@ -24,6 +37,18 @@ class DailyForecastViewHolder(view:View, private val tempDisplaySettingsManager:
 {
     private val tempText : TextView = view.findViewById(R.id.tempText)
     private val descriptionText : TextView = view.findViewById(R.id.descriptionText)
+    /*
+    now we want to come to the forecast
+view holder and we want to add a
+reference to the new date text property
+and then update how we're binding that
+data to the ui
+
+     */
+    private val dateText = view.findViewById<TextView>(R.id.dateText)
+    private val forecastIcon = view.findViewById<ImageView>(R.id.forecastIcon)
+
+
 
     /*So now we have access to those views, we are going to create a simple
       method Bind. Bind is gonna get called from the adapter's onBind method
@@ -31,10 +56,94 @@ class DailyForecastViewHolder(view:View, private val tempDisplaySettingsManager:
       to those views we just referenced
     * */
 
+
+
     fun bind(dailyForecast: DailyForecast)
     {
-        tempText.text = formatTempForDisplay(dailyForecast.temp,tempDisplaySettingsManager.getTempDisplaySetting())
-        descriptionText.text = dailyForecast.description
+        /*
+        now down here in our bind
+method
+so we no longer can pass daily
+forecast.temp
+what we need to do is type
+dailyforecast.temp.max
+so now our temperature text will be
+updated properly
+f
+         */
+        tempText.text = formatTempForDisplay(dailyForecast.temp.max,tempDisplaySettingsManager.getTempDisplaySetting())
+        /*
+        we're going to get the zero element from
+that
+weather list
+and then we're gonna pass in the
+description so we will get the first
+weather description and we should always
+have at least one
+and we'll pass that description into our
+text view
+
+         */
+        descriptionText.text = dailyForecast.weather[0].description
+        /*
+        and then finally the new date text here
+
+so we're going to type date
+text dot text
+equals and then we're going to want to
+format this
+text in some way that is understandable
+and meaningful
+to the users and one way that we can go
+about doing that
+is to use a date format
+so we're just going to scroll up to the
+top of the file here and i'm going to
+define
+a date format that we can use to format
+dates into something we can read easily
+
+         */
+        /*
+        dot date and then there's one little
+caveat here
+the date class expects this to come back
+in milliseconds and the api is giving us
+back
+seconds so we're just going to multiply
+this
+by a thousand
+and that will make sure that our date is
+going to display properly
+in the ui
+
+         */
+        dateText.text = DATE_FORMAT.format(Date(dailyForecast.date * 1000))
+        /*
+i'm going to start off by getting the
+icon id out of that daily forecast item
+
+ */
+        /*
+        so i'm gonna grab the first a weather
+description which is the primary weather
+description
+and grab the icon id and then
+
+         */
+        val iconId2 = dailyForecast.weather[0].icon
+            /*
+        and then we're going to pass in a string
+here and that string is going to be that
+predefined string
+that the api uses for the icons
+so that
+         */
+                                                            //we're gonna do a string substitution here
+        forecastIcon.load(("http://openweathermap.org/img/wn/${iconId2}@2x.png"))
+
+
+
     }
 }
 

@@ -8,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.firstapp.*
+import com.example.firstapp.api.DailyForecast
+import com.example.firstapp.api.WeeklyForecast
 import com.example.firstapp.details.ForecastDetailsFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -21,6 +24,7 @@ class WeeklyForecastFragement : Fragment() {
 
     private lateinit var tempDisplaySettingsManager: TempDisplaySettingsManager
 
+    private lateinit var locationRepository: LocationRepository
     private val forecastRepository = ForecastRepository()
 
 
@@ -72,15 +76,60 @@ class WeeklyForecastFragement : Fragment() {
         forecastListRecyclerView.adapter = dailyForecastAdapter
 
 
-        val weeklyForcastObserver = Observer<List<DailyForecast>>{ forecastItems->
+        val weeklyForcastObserver = Observer<WeeklyForecast>{ weeklyForecast->
+            /*
+            and now we'll pass in weekly forecast
+dot daily that'll pass in that
+list of the daily forecast items to our
+adapter
 
-            dailyForecastAdapter.submitList(forecastItems)
+             */
+            dailyForecastAdapter.submitList(weeklyForecast.daily)
 
         }
 
-        forecastRepository.weeklyForecast.observe(this,weeklyForcastObserver)
+        forecastRepository.weeklyForecast.observe(viewLifecycleOwner,weeklyForcastObserver)
 
-        forecastRepository.loadForecast(zipcode)
+
+
+
+
+
+
+
+
+
+        //Created Observer
+
+        locationRepository = LocationRepository(requireContext())
+        val savedLocationObserver = Observer<Location> {savedLocaation ->
+        when(savedLocaation)
+        {
+            is Location.Zipcode -> forecastRepository.loadWeeklyForecast(savedLocaation.zipcode)
+        }
+        }
+
+        //Now to observe value
+
+        locationRepository.savedLocation.observe(viewLifecycleOwner,savedLocationObserver)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         return view
     }
 
@@ -93,9 +142,26 @@ class WeeklyForecastFragement : Fragment() {
     }
 
 
+    /*
+    we also are going to want to update um
+how we are passing this data in so again
+let's update the import for daily
+forecast
+and then now we're going to need to
+update how we're getting the temperature
+and the description
+so let's create a new property for the
+temperature
+so we'll say val temp equals
+
+     */
+
+
     private fun showForecastDetails(forecast: DailyForecast)
     {
-        val action = WeeklyForecastFragementDirections.actionWeeklyForecastFragementToForecastDetailsFragment(forecast.temp,forecast.description)
+        val temp = forecast.temp.max
+        val description = forecast.weather[0].description
+        val action = WeeklyForecastFragementDirections.actionWeeklyForecastFragementToForecastDetailsFragment(temp,description)
         findNavController().navigate(action)
     }
 

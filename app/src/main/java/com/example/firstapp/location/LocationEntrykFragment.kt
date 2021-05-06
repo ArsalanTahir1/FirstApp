@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import com.example.firstapp.Location
+import com.example.firstapp.LocationRepository
 import com.example.firstapp.R
 
 
@@ -32,10 +34,7 @@ class LocationEntrykFragment : Fragment() {
      */
 
 
-
-
-
-
+/*
 
 //    /*
 //    The reason its lateinit bcoz we are going to initialize it onAttach()
@@ -67,14 +66,18 @@ class LocationEntrykFragment : Fragment() {
 //    }
 
 
+*/
 
 
-
-
+    private lateinit var locationRepository: LocationRepository
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
+
+        locationRepository = LocationRepository(requireContext())
+
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_location_entryk, container, false)
 
@@ -100,6 +103,9 @@ class LocationEntrykFragment : Fragment() {
 
             else
             {
+                //Anytime we are going to enter a new zipcode, we are going to save that in location reposotoru
+                locationRepository.saveLocation(Location.Zipcode(zipcode))
+
                 /*
                 When we click on button, its going to call navigateToCurrentForecast on
                 the appNavigator interface that is then going to come in the main activity

@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -58,6 +60,10 @@ class WeeklyForecastFragement : Fragment() {
         val view = inflater.inflate(R.layout.fragment_weekly_forecast, container, false)
 
 
+        val emptyText: TextView = view.findViewById(R.id.emptyText)
+        val progrssBar          = view.findViewById<ProgressBar>(R.id.progressBar)
+
+
 
         val locationEntryButton :FloatingActionButton = view.findViewById(R.id.floatingActionButton2)
             locationEntryButton.setOnClickListener(){
@@ -78,6 +84,11 @@ class WeeklyForecastFragement : Fragment() {
 
         val weeklyForcastObserver = Observer<WeeklyForecast>{ weeklyForecast->
 
+            emptyText.visibility = View.GONE
+            progrssBar.visibility = View.GONE
+
+
+            //update UI
             dailyForecastAdapter.submitList(weeklyForecast.daily)
 
         }
@@ -99,7 +110,13 @@ class WeeklyForecastFragement : Fragment() {
         val savedLocationObserver = Observer<Location> {savedLocaation ->
         when(savedLocaation)
         {
-            is Location.Zipcode -> forecastRepository.loadWeeklyForecast(savedLocaation.zipcode)
+
+            is Location.Zipcode ->
+            {
+                progrssBar.visibility = View.VISIBLE
+                forecastRepository.loadWeeklyForecast(savedLocaation.zipcode)
+            }
+
         }
         }
 
